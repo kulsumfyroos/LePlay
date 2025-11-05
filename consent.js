@@ -161,13 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     header.textContent = `Child ${groupIndex}`;
     group.appendChild(header);
 
-    // --- Name ---
+    // --- Legal Name ---
     const nameLabel = document.createElement('label');
-    nameLabel.textContent = 'Name';
+    nameLabel.textContent = 'Legal Name';
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.required = true;
-    nameInput.placeholder = "Child's full name";
+    nameInput.placeholder = "Child's legal full name";
     nameInput.value = child.name ||child.legalname|| '';
     nameInput.id = `childName${groupIndex}`;
 
