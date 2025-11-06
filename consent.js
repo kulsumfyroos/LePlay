@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nameInput.type = 'text';
     nameInput.required = true;
     nameInput.placeholder = "Child's legal full name";
-    nameInput.value = child.name ||child.legalname|| '';
+    nameInput.value = child.legalname || child.name || '';
     nameInput.id = `childName${groupIndex}`;
 
     // --- Date of Birth ---
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {Array<{name:string,dob:string}>} children
    */
   function composeConsentText(parentName, children) {
-    const childNames = children.map(c => c.legalname || c,name).join(', ');
+    const childNames = children.map(c => c.legalname || c.name).join(', ');
     // Generic consent statement – this should be replaced with actual legal text
     return `I, ${parentName}, as the parent/guardian of ${childNames}, hereby give consent for my child/children to participate in activities at LePlay – Little Engineers Playground, operated by FOREVER KID LLP. I acknowledge that participation involves inherent risks and agree that I will not hold the company liable for any injury or loss incurred while my child/children are on the premises. By signing below, I confirm that the information provided is accurate and that I have read and understood this consent form.`;
   }
@@ -500,3 +500,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+// Cache bust: 11/05/2025 13:16:11
