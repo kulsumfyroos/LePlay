@@ -50,36 +50,18 @@
         }
         
         .zone-selector {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
-            border: 2px solid #fde047;
-            margin-bottom: 1rem;
             display: flex;
             gap: 1rem;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 1rem;
         }
         
         .zone-selector label {
-            font-weight: 600;
-            color: #374151;
-            font-size: 1.1rem;
+            display: none;
         }
         
-        .zone-selector select {
-            flex: 1;
-            min-width: 200px;
-            padding: 0.75rem 1rem;
-            border: 2px solid #fde047;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-        }
-        
-        .zone-selector button {
+        .zone-btn {
             padding: 0.75rem 2rem;
             background: #eab308;
             color: black;
@@ -89,11 +71,55 @@
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1rem;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
         }
         
-        .zone-selector button:hover {
+        .zone-btn:hover {
             background: #fde047;
             transform: translateY(-2px);
+        }
+        
+        .zone-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border: 2px solid black;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .zone-dropdown.show {
+            display: block;
+        }
+        
+        .zone-option {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #fde047;
+            transition: background 0.2s;
+            font-weight: 600;
+        }
+        
+        .zone-option:last-child {
+            border-bottom: none;
+        }
+        
+        .zone-option:hover {
+            background: #fef9c3;
+        }
+        
+        .zone-option.selected {
+            background: #eab308;
+            color: white;
         }
         
         .auto-refresh {
@@ -151,8 +177,16 @@
             color: #f59e0b;
         }
         
+        .queue-section.waiting .queue-count {
+            background: #f59e0b;
+        }
+        
         .queue-section.inside h2 {
             color: #10b981;
+        }
+        
+        .queue-section.inside .queue-count {
+            background: #10b981;
         }
         
         .queue-count {
@@ -272,16 +306,17 @@
     <div class="queue-container">
         <!-- Zone Selector -->
         <div class="zone-selector">
-            <label for="zoneSelect">Select Zone:</label>
-            <select id="zoneSelect">
-                <option value="">-- Choose a Zone --</option>
-                <option value="zone-1">Zone 1 - Construction Area</option>
-                <option value="zone-2">Zone 2 - Engineering Lab</option>
-                <option value="zone-3">Zone 3 - Building Blocks</option>
-                <option value="zone-4">Zone 4 - Mini City</option>
-                <option value="zone-5">Zone 5 - Tool Workshop</option>
-            </select>
-            <button id="loadQueueBtn">Load Queue</button>
+            <div class="zone-btn" id="zoneBtn">
+                <span id="zoneBtnText">Select Zone</span>
+                <div class="zone-dropdown" id="zoneDropdown">
+                    <div class="zone-option" data-zone="zone-1">Zone 1 - Construction Area</div>
+                    <div class="zone-option" data-zone="zone-2">Zone 2 - Engineering Lab</div>
+                    <div class="zone-option" data-zone="zone-3">Zone 3 - Building Blocks</div>
+                    <div class="zone-option" data-zone="zone-4">Zone 4 - Mini City</div>
+                    <div class="zone-option" data-zone="zone-5">Zone 5 - Tool Workshop</div>
+                </div>
+            </div>
+            <button class="zone-btn" id="loadQueueBtn">Load Queue</button>
         </div>
         
         <!-- Error Message -->

@@ -15,13 +15,15 @@ const REFRESH_INTERVAL = 5000; // 5 seconds
 
 // State
 let currentZoneId = null;
+let selectedZoneName = null;
 let refreshIntervalId = null;
 
 // DOM Elements
-const zoneSelect = document.getElementById('zoneSelect');
+const zoneBtn = document.getElementById('zoneBtn');
+const zoneBtnText = document.getElementById('zoneBtnText');
+const zoneDropdown = document.getElementById('zoneDropdown');
 const loadQueueBtn = document.getElementById('loadQueueBtn');
 const autoRefreshCheckbox = document.getElementById('autoRefresh');
-const displayZoneName = document.getElementById('displayZoneName');
 const waitingList = document.getElementById('waitingList');
 const insideList = document.getElementById('insideList');
 const waitingCount = document.getElementById('waitingCount');
@@ -31,27 +33,56 @@ const lastUpdated = document.getElementById('lastUpdated');
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // Toggle zone dropdown
+  zoneBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    zoneDropdown.classList.toggle('show');
+  });
+  
+  // Zone option selection
+  const zoneOptions = document.querySelectorAll('.zone-option');
+  zoneOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      // Remove selected class from all options
+      zoneOptions.forEach(opt => opt.classList.remove('selected'));
+      
+      // Add selected class to clicked option
+      option.classList.add('selected');
+      
+      // Store selected zone
+      currentZoneId = option.dataset.zone;
+      selectedZoneName = option.textContent;
+      
+      // Update button text
+      zoneBtnText.textContent = selectedZoneName;
+      
+      // Hide dropdown
+      zoneDropdown.classList.remove('show');
+    });
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', () => {
+    zoneDropdown.classList.remove('show');
+  });
+  
   // Load queue button
   loadQueueBtn.addEventListener('click', handleLoadQueue);
-  
-  // Auto-refresh checkbox
-  autoRefreshCheckbox.addEventListener('change', handleAutoRefreshToggle);
-  
-  // Zone select change
-  zoneSelect.addEventListener('change', () => {
-    // Stop auto-refresh when zone changes
-    if (refreshIntervalId) {
-      clearInterval(refreshIntervalId);
-      refreshIntervalId = null;
-    }
-  });
   
   // Check if zone is passed in URL query parameter
   const urlParams = new URLSearchParams(window.location.search);
   const zoneParam = urlParams.get('zone');
   if (zoneParam) {
-    zoneSelect.value = zoneParam;
-    handleLoadQueue();
+    currentZoneId = zoneParam;
+    const matchingOption = Array.from(zoneOptions).find(opt => opt.dataset.zone === zoneParam);
+    if (matchingOption) {
+      matchingOption.classList.add('selected');
+      selectedZoneName = matchingOption.textContent;
+      zoneBtnText.textContent = selectedZoneName;
+      handleLoadQueue();
+    }
   }
 });
 
@@ -59,14 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
  * Handle load queue button click
  */
 function handleLoadQueue() {
-  const selectedZone = zoneSelect.value;
-  
-  if (!selectedZone) {
+  if (!currentZoneId) {
     showError('Please select a zone first');
     return;
   }
-  
-  currentZoneId = selectedZone;
   
   // Stop existing auto-refresh
   if (refreshIntervalId) {
@@ -77,22 +104,17 @@ function handleLoadQueue() {
   // Load queue data
   fetchQueueData();
   
-  // Start auto-refresh if enabled
-  if (autoRefreshCheckbox.checked) {
-    startAutoRefresh();
-  }
+  // Start auto-refresh (always enabled)
+  startAutoRefresh();
 }
 
 /**
  * Handle auto-refresh toggle
  */
 function handleAutoRefreshToggle() {
-  if (autoRefreshCheckbox.checked) {
-    if (currentZoneId) {
-      startAutoRefresh();
-    }
-  } else {
-    stopAutoRefresh();
+  // Auto-refresh is now always enabled, this function kept for compatibility
+  if (currentZoneId) {
+    startAutoRefresh();
   }
 }
 
@@ -151,13 +173,6 @@ async function fetchQueueData() {
  * Render queue data in the UI
  */
 function renderQueueData(data) {
-  // Update zone name in header
-  if (data.zoneName) {
-    displayZoneName.textContent = data.zoneName;
-  } else {
-    displayZoneName.textContent = data.zoneId;
-  }
-  
   // Render waiting list
   if (data.waiting && data.waiting.length > 0) {
     waitingCount.textContent = data.waiting.length;
