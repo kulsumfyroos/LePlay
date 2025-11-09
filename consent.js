@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sanitize mobile input: allow only digits and limit to 10 characters
   mobileNumberInput.addEventListener('input', () => {
-    mobileNumberInput.value = mobileNumberInput.value.replace(/\D/g, '').slice(0,10);
+    mobileNumberInput.value = mobileNumberInput.value.replace(/\D/g, '').slice(0, 10);
     // 🔄 clear any prefills while typing a new number
     isExistingCustomer = false;
     parentNameInput.readOnly = false;
@@ -167,9 +167,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.required = true;
-    nameInput.placeholder = "Child's legal full name";
-    nameInput.value = child.legalname || child.name || '';
+
+    // ✅ If child has a legalName, show it as placeholder
+    if (child.legalName) {
+      nameInput.placeholder = child.legalName;
+    } else {
+      nameInput.placeholder = "Child's legal full name";
+    }
+
+    // ✅ Optional: also fill the input value if desired
+    nameInput.value = child.legalName || child.legalname || child.name || '';
+
     nameInput.id = `childName${groupIndex}`;
+
+
 
     // --- Date of Birth ---
     const dobLabel = document.createElement('label');
@@ -321,9 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Keep labels generic; just ensure input IDs stay sequential
       const nameInput = group.querySelector("input[id^='childName']");
-      const dobInput  = group.querySelector("input[id^='childDOB']");
+      const dobInput = group.querySelector("input[id^='childDOB']");
       if (nameInput) nameInput.id = `childName${n}`;
-      if (dobInput)  dobInput.id  = `childDOB${n}`;
+      if (dobInput) dobInput.id = `childDOB${n}`;
 
       // First child cannot be removed
       const removeBtn = group.querySelector('button[type="button"]');
@@ -353,23 +364,24 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {string} mobile
    */
   async function fetchExistingConsent(mobile) {
-  try {
-    const response = await fetch(`http://zenon-alb-staging-1894668587.ap-south-1.elb.amazonaws.com/api/consent?mobile=${encodeURIComponent(mobile)}`);
+    try {
+      const response = await fetch(`http://zenon-alb-staging-1894668587.ap-south-1.elb.amazonaws.com/api/consent?mobile=${encodeURIComponent(mobile)}`);
 
-    if (!response.ok) return;
+      if (!response.ok) return;
 
-    const json = await response.json();
-    if (json && json.exists) {
-      isExistingCustomer = true;
-      populateExistingData(json); // sets parentName + children
-    } else {
+      const json = await response.json();
+      if (json && json.exists) {
+        isExistingCustomer = true;
+        populateExistingData(json.data || json); // ✅ supports both wrapped and direct
+      } else {
+        isExistingCustomer = false;
+      }
+
+    } catch (err) {
+      console.error('Error fetching existing consent:', err);
       isExistingCustomer = false;
     }
-  } catch (err) {
-    console.error('Error fetching existing consent:', err);
-    isExistingCustomer = false;
   }
-}
 
   // Event: Next from mobile number to details
   nextToDetailsBtn.addEventListener('click', async () => {
@@ -396,13 +408,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showStep(2);
   });
 
-    // Event: Add child
-    addChildBtn.addEventListener('click', () => {
-      addChildGroup();
-    });
+  // Event: Add child
+  addChildBtn.addEventListener('click', () => {
+    addChildGroup();
+  });
 
-    // Event: Back to mobile number entry
-    backToMobileBtn.addEventListener('click', () => {
+  // Event: Back to mobile number entry
+  backToMobileBtn.addEventListener('click', () => {
     // 🔄 clear form state so a new mobile starts fresh
     isExistingCustomer = false;
     parentNameInput.readOnly = false;
