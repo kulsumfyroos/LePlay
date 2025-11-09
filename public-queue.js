@@ -148,29 +148,33 @@ function stopAutoRefresh() {
  * Fetch queue data from API
  */
 async function fetchQueueData() {
-  if (!currentZoneId) return;
-  
+  if (!currentZoneId) return; // make sure a zone is selected
+
   try {
     hideError();
     showLoading();
-    
+
+    // 👇 Backend will clearly receive a query like ?zoneId=Z1
     const url = `${API_BASE_URL}?zoneId=${encodeURIComponent(currentZoneId)}`;
+    console.log("Fetching data from:", url); // helpful for backend debugging
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`API returned ${response.status}: ${response.statusText}`);
     }
-    
+
     const data = await response.json();
     renderQueueData(data);
     updateLastUpdatedTime();
-    
+
   } catch (error) {
-    console.error('Error fetching queue data:', error);
+    console.error("Error fetching queue data:", error);
     showError(`Failed to fetch queue data: ${error.message}`);
     renderEmptyState();
   }
 }
+
 
 /**
  * Render queue data in the UI
