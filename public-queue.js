@@ -28,8 +28,6 @@ let refreshIntervalId = null;
 const zoneBtn = document.getElementById('zoneBtn');
 const zoneBtnText = document.getElementById('zoneBtnText');
 const zoneDropdown = document.getElementById('zoneDropdown');
-const loadQueueBtn = document.getElementById('loadQueueBtn');
-const autoRefreshCheckbox = document.getElementById('autoRefresh');
 const waitingList = document.getElementById('waitingList');
 const insideList = document.getElementById('insideList');
 const waitingCount = document.getElementById('waitingCount');
@@ -66,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Hide dropdown
       zoneDropdown.classList.remove('show');
+      
+      // Automatically load queue data and start auto-refresh
+      handleLoadQueue();
     });
   });
   
@@ -73,9 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', () => {
     zoneDropdown.classList.remove('show');
   });
-  
-  // Load queue button
-  loadQueueBtn.addEventListener('click', handleLoadQueue);
   
   // Check if zone is passed in URL query parameter
   const urlParams = new URLSearchParams(window.location.search);
@@ -93,11 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Handle load queue button click
+ * Handle load queue (called automatically when zone is selected)
  */
 function handleLoadQueue() {
   if (!currentZoneId) {
-    showError('Please select a zone first');
     return;
   }
   
@@ -107,7 +104,7 @@ function handleLoadQueue() {
     refreshIntervalId = null;
   }
   
-  // Load queue data
+  // Load queue data immediately
   fetchQueueData();
   
   // Start auto-refresh (always enabled)
