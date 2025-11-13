@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/consent", "destination": "/api/consent.js" },
-    { "source": "/api/public-queue", "destination": "/api/public-queue.js" },
-    { "source": "/api/metrics/:path*", "destination": "/api/metrics.js" }
-  ]
-}

@@ -9,7 +9,7 @@
  */
 
 // API Base URL - update this to match your backend
-const API_BASE_URL = "/api/metrics";
+const API_BASE_URL = "https://www.foreverkid.in/api/v1/metrics";
 
 
 // DOM Elements
