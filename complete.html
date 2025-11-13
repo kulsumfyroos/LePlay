@@ -37,13 +37,43 @@
 
     <script>
       (function () {
-        // Read ?mobile= from the URL
-        const params = new URLSearchParams(location.search);
-        const mobile = params.get('mobile') || '';
+        // Read ?mobile= from the URL - handle both direct and redirected URLs
+        const fullUrl = window.location.href;
+        const urlSearch = window.location.search;
+        
+        console.log('Full URL:', fullUrl); // Debug log
+        console.log('URL search:', urlSearch); // Debug log
+        console.log('URL pathname:', window.location.pathname); // Debug log
+        
+        let mobile = '';
+        
+        // Try multiple ways to get the mobile parameter
+        if (urlSearch) {
+          // Standard query parameter
+          const params = new URLSearchParams(urlSearch);
+          mobile = params.get('mobile') || '';
+          console.log('Mobile from URLSearchParams:', mobile);
+        }
+        
+        if (!mobile && fullUrl.includes('mobile=')) {
+          // Extract from full URL if query parsing fails
+          const mobileMatch = fullUrl.match(/mobile=([^&#]*)/);
+          if (mobileMatch) {
+            mobile = decodeURIComponent(mobileMatch[1]);
+            console.log('Mobile from regex match:', mobile);
+          }
+        }
+        
+        console.log('Final mobile value:', mobile); // Debug log
 
         // Show the mobile number
         const mobileEl = document.getElementById('mobileDisplay');
-        if (mobile) mobileEl.textContent = `Mobile: ${mobile}`;
+        if (mobile && mobile.trim()) {
+          mobileEl.textContent = `Mobile: ${mobile}`;
+        } else {
+          mobileEl.textContent = 'Mobile: Not provided';
+          console.error('No mobile number found in URL');
+        }
 
         // Render the QR code
         const holder = document.getElementById('qrCodeContainer');

@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Create a new child input group with name and DOB fields
    * Optionally prepopulate the values
-   * @param {Object} child optional object containing name and dob (ISO string or yyyy-mm-dd)
+   * @param {Object} child optional object containing legalName/legalname, displayName/displayname, and dob (ISO string or yyyy-mm-dd)
    */
   function addChildGroup(child = {}) {
     const groupIndex = childrenContainer.querySelectorAll('.child-group').length + 1;
@@ -168,17 +168,26 @@ document.addEventListener('DOMContentLoaded', () => {
     nameInput.type = 'text';
     nameInput.required = true;
 
-    // ✅ If child has a legalName, show it as placeholder
-    if (child.legalName) {
-      nameInput.placeholder = child.legalName;
-    } else {
-      nameInput.placeholder = "Child's legal full name";
-    }
-
-    // ✅ Optional: also fill the input value if desired
-    nameInput.value = child.legalName || child.legalname || child.name || '';
+    // ✅ Populate legal name value and placeholder
+    const legalName = child.legalName || child.legalname || child.name || '';
+    nameInput.value = legalName;
+    nameInput.placeholder = legalName || "Child's legal full name";
 
     nameInput.id = `childName${groupIndex}`;
+
+    // --- Display Name (Nick Name) ---
+    const displayNameLabel = document.createElement('label');
+    displayNameLabel.textContent = 'Display Name';
+    const displayNameInput = document.createElement('input');
+    displayNameInput.type = 'text';
+    displayNameInput.required = false;
+
+    // ✅ Populate display name value and placeholder
+    const displayName = child.displayName || child.displayname || child.displayName || child.nick_name || child.nickname || '';
+    displayNameInput.value = displayName;
+    displayNameInput.placeholder = displayName || "Child's nickname or preferred name";
+
+    displayNameInput.id = `childDisplayName${groupIndex}`;
 
 
 
@@ -224,6 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Append in the new order
     group.appendChild(nameLabel);
     group.appendChild(nameInput);
+    group.appendChild(displayNameLabel);
+    group.appendChild(displayNameInput);
     group.appendChild(dobLabel);
     group.appendChild(dobHint);   // hint sits just below the DOB label
     group.appendChild(dobInput);
@@ -238,15 +249,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Gather all child data from the childrenContainer
-   * @returns {Array<{name:string,dob:string}>}
+   * @returns {Array<{legalname:string,displayname:string,dob:string}>}
    */
   function getChildData() {
     const data = [];
     const groups = childrenContainer.querySelectorAll('.child-group');
     groups.forEach(group => {
       const nameInput = group.querySelector("input[id^='childName']");
+      const displayNameInput = group.querySelector("input[id^='childDisplayName']");
       const dobInput = group.querySelector("input[id^='childDOB']");
-      data.push({ legalname: nameInput.value.trim(), dob: dobInput.value });
+      data.push({ 
+        legalname: nameInput.value.trim(), 
+        displayname: displayNameInput.value.trim(),
+        dob: dobInput.value 
+      });
     });
     return data;
   }
@@ -280,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
         valid = false;
         const err = document.createElement('span');
         err.className = 'error child-error';
-        err.textContent = 'Please enter name and date of birth.';
+        err.textContent = 'Please enter legal name and date of birth.';
         group.appendChild(err);
       } else {
         // Validate date is at least two years before today
@@ -311,7 +327,11 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {Array<{name:string,dob:string}>} children
    */
   function composeConsentText(parentName, children) {
-    const childNames = children.map(c => c.legalname || c.name).join(', ');
+    const childNames = children.map(c => {
+      const legalName = c.legalname || c.name;
+      const displayName = c.displayname;
+      return displayName ? `${legalName} (${displayName})` : legalName;
+    }).join(', ');
     // Generic consent statement – this should be replaced with actual legal text
     return `I, ${parentName}, as the parent/guardian of ${childNames}, hereby give consent for my child/children to participate in activities at LePlay – Little Engineers Playground, operated by FOREVER KID LLP. I acknowledge that participation involves inherent risks and agree that I will not hold the company liable for any injury or loss incurred while my child/children are on the premises. By signing below, I confirm that the information provided is accurate and that I have read and understood this consent form.`;
   }
@@ -332,8 +352,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Keep labels generic; just ensure input IDs stay sequential
       const nameInput = group.querySelector("input[id^='childName']");
+      const displayNameInput = group.querySelector("input[id^='childDisplayName']");
       const dobInput = group.querySelector("input[id^='childDOB']");
       if (nameInput) nameInput.id = `childName${n}`;
+      if (displayNameInput) displayNameInput.id = `childDisplayName${n}`;
       if (dobInput) dobInput.id = `childDOB${n}`;
 
       // First child cannot be removed
@@ -348,12 +370,14 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   function populateExistingData(data) {
     if (!data) return;
+    console.log('Populating existing data:', data); // Debug log
     if (data.parentName) {
       parentNameInput.value = data.parentName;
     }
     if (Array.isArray(data.children)) {
       clearChildren();
-      data.children.forEach(child => {
+      data.children.forEach((child, index) => {
+        console.log(`Child ${index + 1} data:`, child); // Debug log
         addChildGroup(child);
       });
     }
@@ -473,11 +497,25 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Please provide your signature before finishing.');
       return;
     }
+    
+    // Get mobile number from the input field
+    const mobileInput = document.getElementById('mobileNumber');
+    const mobile = mobileInput ? mobileInput.value.trim() : '';
+    console.log('Mobile input element:', mobileInput); // Debug log
+    console.log('Mobile number from input:', mobile); // Debug log
+    
+    if (!mobile) {
+      alert('Mobile number is missing. Please go back and enter your mobile number.');
+      return;
+    }
+    
     // Collect data
     const parentName = parentNameInput.value.trim();
-    const mobile = mobileNumberInput.value.trim();
     const children = getChildData();
     const signatureDataUrl = signaturePad.toDataURL('image/png');
+    
+    console.log('Form data:', { parentName, mobile, children }); // Debug log
+    
     // Construct payload
     const payload = {
       parentName,
@@ -488,26 +526,54 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       finishBtn.disabled = true;
       finishBtn.textContent = 'Submitting…';
+      
+      console.log('Submitting to:', 'https://www.foreverkid.in/api/consent'); // Debug log
+      console.log('Payload:', JSON.stringify(payload, null, 2)); // Debug log
+      
       const response = await fetch('https://www.foreverkid.in/api/consent', {
-
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+      
+      console.log('Response status:', response.status); // Debug log
+      console.log('Response ok:', response.ok); // Debug log
+      
       if (!response.ok) {
-        throw new Error('Failed to submit consent');
+        const errorText = await response.text();
+        console.error('Backend error response:', errorText); // Debug log
+        throw new Error(`Failed to submit consent: ${response.status} - ${errorText}`);
       }
+      
       // Expect JSON response { success: true }
       const result = await response.json();
+      console.log('Backend response:', result); // Debug log
+      console.log('Redirecting with mobile:', mobile); // Debug log
+      
       if (result && result.success) {
         // Redirect to completion page with mobile parameter
-        window.location.href = `complete.html?mobile=${encodeURIComponent(mobile)}`;
+        // Use the redirected URL format that serve uses
+        const redirectUrl = `complete?mobile=${encodeURIComponent(mobile)}`;
+        console.log('Redirect URL:', redirectUrl); // Debug log
+        window.location.href = redirectUrl;
       } else {
-        alert('There was an issue submitting the consent. Please try again.');
+        console.error('Backend returned success=false:', result);
+        
+        // Handle specific error messages
+        if (result.message && result.message.includes('already submitted')) {
+          alert(`⚠️ Form Already Submitted Today\n\nThis mobile number has already submitted a consent form today. \n\nIf you need to add more children, please:\n• Contact the facility staff, or\n• Try again tomorrow, or\n• Use a different mobile number\n\nNote: You can register multiple children in a single form submission.`);
+        } else {
+          alert(`Submission failed: ${result.message || 'Unknown error. Please try again.'}`);
+        }
       }
     } catch (err) {
       console.error('Error submitting consent:', err);
-      alert('An error occurred while submitting your consent. Please try again later.');
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      });
+      alert(`An error occurred while submitting your consent: ${err.message}. Please try again later.`);
     } finally {
       finishBtn.disabled = false;
       finishBtn.textContent = 'Finish';

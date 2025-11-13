@@ -185,10 +185,17 @@ function renderQueueData(data) {
     waitingCount.textContent = data.waiting.length;
     waitingList.innerHTML = '';
     
+    // Create scroll container for auto-scroll
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'scroll-container';
+    
     data.waiting.forEach((child, index) => {
       const card = createChildCard(child, index + 1);
-      waitingList.appendChild(card);
+      scrollContainer.appendChild(card);
     });
+    
+    waitingList.appendChild(scrollContainer);
+    adjustChildListDisplay(waitingList, data.waiting.length);
   } else {
     waitingCount.textContent = '0';
     waitingList.innerHTML = '<div class="empty-state">No children waiting</div>';
@@ -199,14 +206,56 @@ function renderQueueData(data) {
     insideCount.textContent = data.inside.length;
     insideList.innerHTML = '';
     
+    // Create scroll container for auto-scroll
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'scroll-container';
+    
     data.inside.forEach((child, index) => {
       const card = createChildCard(child, index + 1);
-      insideList.appendChild(card);
+      scrollContainer.appendChild(card);
     });
+    
+    insideList.appendChild(scrollContainer);
+    adjustChildListDisplay(insideList, data.inside.length);
   } else {
     insideCount.textContent = '0';
     insideList.innerHTML = '<div class="empty-state">No children inside</div>';
   }
+}
+
+/**
+ * Adjust child list display based on number of children
+ * Prioritizes readability for distance viewing
+ */
+function adjustChildListDisplay(listElement, childCount) {
+  // Remove existing classes
+  listElement.classList.remove('many-children', 'extra-many-children', 'auto-scroll', 'compact-mode');
+  
+  if (childCount > 12) {
+    // Extreme case - use compact horizontal layout but keep text readable
+    listElement.classList.add('compact-mode', 'auto-scroll');
+    
+    // Slower scroll for better readability
+    const scrollDuration = Math.max(15, childCount * 3); // Minimum 15s, 3s per child
+    const scrollContainer = listElement.querySelector('.scroll-container');
+    if (scrollContainer) {
+      scrollContainer.style.animationDuration = scrollDuration + 's';
+    }
+  } else if (childCount > 8) {
+    // Many children - reduce spacing but keep large text
+    listElement.classList.add('extra-many-children', 'auto-scroll');
+    
+    // Slower scroll for distance viewing
+    const scrollDuration = Math.max(12, childCount * 2.5); // Minimum 12s, 2.5s per child
+    const scrollContainer = listElement.querySelector('.scroll-container');
+    if (scrollContainer) {
+      scrollContainer.style.animationDuration = scrollDuration + 's';
+    }
+  } else if (childCount > 5) {
+    // Some children - slight reduction but maintain readability
+    listElement.classList.add('many-children');
+  }
+  // else: normal size for 5 or fewer children (optimal for distance viewing)
 }
 
 /**

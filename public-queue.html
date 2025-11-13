@@ -194,10 +194,79 @@
         .child-list {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
             flex: 1;
-            overflow-y: auto;
+            overflow: hidden;
             padding-right: 0.5rem;
+            min-height: 0;
+        }
+        
+        /* Maintain large sizes for distance viewing */
+        .child-list.many-children .child-card {
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+        
+        .child-list.many-children .child-number {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+        
+        .child-list.many-children .child-name {
+            font-size: 1.8rem;
+        }
+        
+        /* For very many children - still keep text large */
+        .child-list.extra-many-children .child-card {
+            padding: 1.2rem;
+            gap: 1.2rem;
+        }
+        
+        .child-list.extra-many-children .child-number {
+            width: 65px;
+            height: 65px;
+            font-size: 1.8rem;
+        }
+        
+        .child-list.extra-many-children .child-name {
+            font-size: 1.6rem;
+        }
+        
+        /* Auto-scroll with slower, more readable pace */
+        .child-list.auto-scroll {
+            overflow: hidden;
+        }
+        
+        .child-list.auto-scroll .scroll-container {
+            animation: autoScrollSlow linear infinite;
+        }
+        
+        @keyframes autoScrollSlow {
+            0% { transform: translateY(0); }
+            30% { transform: translateY(0); }
+            70% { transform: translateY(-60%); }
+            100% { transform: translateY(-60%); }
+        }
+        
+        /* Compact mode for extreme cases - but still readable */
+        .child-list.compact-mode .child-card {
+            padding: 1rem;
+            gap: 1rem;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+        
+        .child-list.compact-mode .child-number {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .child-list.compact-mode .child-name {
+            font-size: 1.4rem;
+            text-align: left;
         }
         
         .child-card {
