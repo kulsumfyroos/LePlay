@@ -212,11 +212,7 @@
     <div class="analytics-container">
         <!-- Logout Section -->
         <div class="logout-section">
-            <div class="user-info">
-                <div class="username" id="usernameDisplay">User</div>
-                <div class="session-time" id="sessionTime">Session time</div>
-            </div>
-            <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+            <button class="logout-btn" onclick="handleLogout()">🚺 Logout</button>
         </div>
         
         <!-- Header -->
@@ -271,25 +267,12 @@
     
     <script src="analytics.js"></script>
     <script>
-        // Update user info display
-        function updateUserInfo() {
-            const userData = getUserData(AUTH_KEYS.ANALYTICS);
-            if (userData) {
-                document.getElementById('usernameDisplay').textContent = userData.username;
-                document.getElementById('sessionTime').textContent = `Session: ${getRemainingSessionTime(AUTH_KEYS.ANALYTICS)} remaining`;
-            }
-        }
-        
         // Handle logout
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
                 logout(AUTH_KEYS.ANALYTICS, 'analytics-login.html');
             }
         }
-        
-        // Update user info on load and every minute
-        updateUserInfo();
-        setInterval(updateUserInfo, 60000);
     </script>
 </body>
 </html>

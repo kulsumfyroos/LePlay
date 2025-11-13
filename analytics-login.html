@@ -182,7 +182,7 @@
                 />
             </div>
             
-            <button type="submit" class="login-btn">Login to Analytics</button>
+            <button type="submit" class="login-btn">Login</button>
         </form>
     </div>
 
@@ -208,17 +208,15 @@
                 return;
             }
 
-            // Basic authentication check (customize as needed)
-            // For demo purposes, accepting any non-empty credentials
-            // In a real scenario, you might want specific usernames/passwords
-            if (username.length >= 3 && password.length >= 4) {
+            // Authentication check - admin@foreverkid.in access only
+            if (username === 'admin@foreverkid.in' && password === 'admin@4ever') {
                 // Store auth data
                 storeAuth(AUTH_KEYS.ANALYTICS, username);
                 
                 // Redirect to analytics dashboard
                 window.location.href = 'analytics.html';
             } else {
-                showError('Invalid credentials. Username must be at least 3 characters and password at least 4 characters.');
+                showError('Invalid credentials. Please check your username and password.');
             }
         });
 
