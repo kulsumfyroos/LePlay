@@ -552,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (result && result.success) {
         // Redirect to completion page with mobile parameter
-        // Use the redirected URL format that serve uses
-        const redirectUrl = `complete?mobile=${encodeURIComponent(mobile)}`;
+        // Use .html extension for Vercel compatibility
+        const redirectUrl = `complete.html?mobile=${encodeURIComponent(mobile)}`;
         console.log('Redirect URL:', redirectUrl); // Debug log
         window.location.href = redirectUrl;
       } else {
