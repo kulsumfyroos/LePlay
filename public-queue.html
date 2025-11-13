@@ -361,10 +361,75 @@
                 margin-left: 0;
             }
         }
+        
+        .logout-section {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #bef264;
+            z-index: 2000;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: 0.85rem;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .session-time {
+            color: #78716c;
+            font-size: 0.75rem;
+        }
+        
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
+    <!-- Authentication check - must be first script -->
+    <script src="auth.js"></script>
+    <script>
+        // Protect this page - redirect to login if not authenticated
+        protectPage(AUTH_KEYS.PUBLIC_QUEUE, 'public-queue-login.html');
+    </script>
+    
     <div class="queue-container">
+        <!-- Logout Section -->
+        <div class="logout-section">
+            <div class="user-info">
+                <div class="username" id="usernameDisplay">User</div>
+                <div class="session-time" id="sessionTime">Session time</div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+        </div>
+        
         <!-- Zone Selector -->
         <div class="zone-selector">
             <div class="zone-btn" id="zoneBtn">
@@ -412,5 +477,26 @@
     </div>
     
     <script src="public-queue.js"></script>
+    <script>
+        // Update user info display
+        function updateUserInfo() {
+            const userData = getUserData(AUTH_KEYS.PUBLIC_QUEUE);
+            if (userData) {
+                document.getElementById('usernameDisplay').textContent = userData.username;
+                document.getElementById('sessionTime').textContent = `Session: ${getRemainingSessionTime(AUTH_KEYS.PUBLIC_QUEUE)} remaining`;
+            }
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                logout(AUTH_KEYS.PUBLIC_QUEUE, 'public-queue-login.html');
+            }
+        }
+        
+        // Update user info on load and every minute
+        updateUserInfo();
+        setInterval(updateUserInfo, 60000);
+    </script>
 </body>
 </html>
