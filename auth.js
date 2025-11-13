@@ -21,6 +21,11 @@ function storeAuth(authKey, username) {
     loginTime: Date.now()
   };
   localStorage.setItem(authKey, JSON.stringify(authData));
+  
+  // If logging into analytics, also grant access to public-queue
+  if (authKey === AUTH_KEYS.ANALYTICS) {
+    localStorage.setItem(AUTH_KEYS.PUBLIC_QUEUE, JSON.stringify(authData));
+  }
 }
 
 /**
@@ -80,6 +85,10 @@ function getUserData(authKey) {
  * @param {string} redirectUrl - URL to redirect to after logout
  */
 function logout(authKey, redirectUrl) {
+  // If logging out from analytics, also clear public-queue access
+  if (authKey === AUTH_KEYS.ANALYTICS) {
+    localStorage.removeItem(AUTH_KEYS.PUBLIC_QUEUE);
+  }
   localStorage.removeItem(authKey);
   window.location.href = redirectUrl;
 }

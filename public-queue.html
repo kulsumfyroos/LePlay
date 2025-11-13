@@ -416,8 +416,8 @@
     <!-- Authentication check - must be first script -->
     <script src="auth.js"></script>
     <script>
-        // Protect this page - redirect to login if not authenticated
-        protectPage(AUTH_KEYS.PUBLIC_QUEUE, 'public-queue-login.html');
+        // Protect this page - redirect to analytics login (single login for both pages)
+        protectPage(AUTH_KEYS.PUBLIC_QUEUE, 'analytics-login.html');
     </script>
     
     <div class="queue-container">
@@ -490,7 +490,7 @@
         // Handle logout
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                logout(AUTH_KEYS.PUBLIC_QUEUE, 'public-queue-login.html');
+                logout(AUTH_KEYS.ANALYTICS, 'analytics-login.html');
             }
         }
         
