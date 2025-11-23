@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   async function fetchExistingConsent(mobile) {
     try {
-      const response = await fetch(`https://www.foreverkid.in/api/consent?mobile=${encodeURIComponent(mobile)}`);
+      const response = await fetch(`https://www.littleengineersplayground.com/api/consent?mobile=${encodeURIComponent(mobile)}`);
 
       if (!response.ok) return;
 
@@ -527,10 +527,10 @@ document.addEventListener('DOMContentLoaded', () => {
       finishBtn.disabled = true;
       finishBtn.textContent = 'Submitting…';
       
-      console.log('Submitting to:', 'https://www.foreverkid.in/api/consent'); // Debug log
+      console.log('Submitting to:', 'https://www.littleengineersplayground.com/api/consent'); // Debug log
       console.log('Payload:', JSON.stringify(payload, null, 2)); // Debug log
       
-      const response = await fetch('https://www.foreverkid.in/api/consent', {
+      const response = await fetch('https://www.littleengineersplayground.com/api/consent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
